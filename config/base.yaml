@@ -1,0 +1,12 @@
+# 디렉토리 설정
+path:
+  dir_path: "./data"
+  train_path: "train.csv"
+  test_path: "test.csv"
+  train_split_path: "train_split.csv"
+  valid_split_path: "valid_split.csv"
+  submission_path: "sample_submission.csv"
+
+# 모델 이름 설정
+
+# 모델 하이퍼파라미터 설정
