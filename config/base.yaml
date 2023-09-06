@@ -6,6 +6,7 @@ path:
   train_split_path: "train_split.csv"
   valid_split_path: "valid_split.csv"
   submission_path: "sample_submission.csv"
+  best_iterations_path: "./save_iterations/best_iterations.json"
 
 # 모델 이름 설정
 
