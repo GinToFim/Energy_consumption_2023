@@ -18,15 +18,6 @@ def load_test_df(dir_path, test_path):
     test_df = load_df(dir_path, test_path)
     return test_df
 
-
-
-if __name__ == '__main__':
-    dir_path = "./data"
-
-    train_path = "train_split.csv"
-    valid_path = "valid_split.csv"
-
-    train_df = load_train_df(dir_path, train_path)
-
-    print(train_df)
-
+def load_submission_df(dir_path, submission_path):
+    submission_df = load_df(dir_path, submission_path)
+    return submission_df
