@@ -9,9 +9,6 @@ __pycache__/
 # log
 logs/
 
-# pretrained
-klue-roberta-pretrained/
-
 # Distribution / packaging
 .Python
 env/
@@ -106,10 +103,11 @@ ENV/
 # mypy
 .mypy_cache/
 
-# input data, saved log, checkpoints
-save_iterations/
-
 # editor, os cache directory
 .vscode/
 .idea/
 __MACOSX/
+
+# save_iterations & predictions
+save_iterations/
+predictions/
