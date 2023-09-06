@@ -1,8 +1,5 @@
-import random
 import json
-import pandas as pd
 import numpy as np
-import os
 
 # XGBoost Regressor model load
 from xgboost import XGBRegressor
@@ -25,13 +22,13 @@ def train(conf):
 
     # 데이터프레임 불러오기
     train_df = load.load_train_df(dir_path, train_path) 
-    valid_df = load.load_train_df(dir_path, valid_path)
+    valid_df = load.load_valid_df(dir_path, valid_path)
     print("⚡ Load Data Success")
 
     # 데이터 전처리하기
-    dp_train_df = preprocessing.train_pre_processing(train_df)
+    new_train_df = preprocessing.train_pre_processing(train_df)
     # TODO : valid_pre_processing 함수 만들기
-    dp_valid_df = preprocessing.test_pre_processing(valid_df, train_df=train_df)
+    new_valid_df = preprocessing.test_pre_processing(valid_df, train_df=train_df)
     print("⚡ Data Preprocessing Success")
 
     # Early stopping을 이용하여 건물별 best iteration 저장 
@@ -47,11 +44,11 @@ def train(conf):
     # building별로 모델 학습 및 훈련하기 
     for building_num in tqdm(range(start, end + 1)):
         
-        X_train = dp_train_df[dp_train_df["building_num"] == building_num].drop(['building_num', 'power'], axis=1)
-        y_train = dp_train_df[dp_train_df["building_num"] == building_num]['power']
+        X_train = new_train_df[new_train_df["building_num"] == building_num].drop(['building_num', 'power'], axis=1)
+        y_train = new_train_df[new_train_df["building_num"] == building_num]['power']
 
-        X_valid = dp_valid_df[dp_valid_df["building_num"] == building_num].drop(['building_num', 'power'], axis=1)
-        y_valid = dp_valid_df[dp_valid_df["building_num"] == building_num]['power']
+        X_valid = new_valid_df[new_valid_df["building_num"] == building_num].drop(['building_num', 'power'], axis=1)
+        y_valid = new_valid_df[new_valid_df["building_num"] == building_num]['power']
         
         X_train['week'] = X_train['week'].astype('int64')
         X_valid['week'] = X_valid['week'].astype('int64')
@@ -85,40 +82,6 @@ def train(conf):
     print("-"*45)
 
     # best_iterations 저장하기
-    iterations_path = "./save_iterations/best_iterations.json"
+    iterations_path = conf.path.best_iterations_path
     with open(iterations_path, "w") as f :
         json.dump(best_iterations_dict, f)    
-
-
-import argparse
-
-import numpy as np
-import torch
-import random
-import os
-from omegaconf import OmegaConf
-
-if __name__ == "__main__":
-
-    # parser 객체 생성
-    parser = argparse.ArgumentParser()
-
-    # omegaconfig 파일 이름 설정하고 실행
-    parser.add_argument("--config", "-c", type=str, default="base")
-    args = parser.parse_args()
-
-    # yaml 파일 load
-    conf = OmegaConf.load(f"./config/{args.config}.yaml")
-    
-    print("⚡ 실행 중인 config file:", args.config)
-
-    # For reproducibility
-
-    def seed_everything(seed):
-        random.seed(seed)
-        os.environ['PYTHONHASHSEED'] = str(seed)
-        np.random.seed(seed)
-        
-    seed_everything(42) # seed 고정
-
-    train(conf)
