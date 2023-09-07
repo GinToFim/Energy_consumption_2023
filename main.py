@@ -8,6 +8,7 @@ from omegaconf import OmegaConf
 
 import train
 import inference
+import opt_search
 
 # For reproducibility
 def seed_everything(seed):
@@ -32,13 +33,17 @@ if __name__ == "__main__":
     
     print("⚡ 실행 중인 config file:", args.config)
 
-    # [python main.py -m t]  or  [python main.py -m train]
+    # [python main.py -m t]  or [python main.py -m train]
     if args.mode == "t" or args.mode == "train":
         train.train(conf)
-    # [python main.py -m i]  or  [python main.py -m inference]    
+    # [python main.py -m i]  or [python main.py -m inference]    
     elif args.mode == "i" or args.mode == "inference":
         inference.inference(conf)
+    # [python main.py -m o] or [python main.py -m optuna]
+    elif args.mode == "o" or args.mode == "optuna":
+        opt_search.opt_search(conf)
     else:
         print("실행모드를 다시 입력해주세요.")
-        print("train        : t,\ttrain")
-        print("inference    : i,\tinference")  # 아직 만드는 중
+        print("train         : t,  train")
+        print("inference     : i,  inference") 
+        print("optuna search : o,  optuna")
