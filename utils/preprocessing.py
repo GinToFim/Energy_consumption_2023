@@ -1,8 +1,18 @@
 import numpy as np
 import pandas as pd
+from typing import *
 
 
-def rename_columns(df):
+def rename_columns(df: pd.DataFrame) -> pd.DataFrame:
+    """_summary_
+
+    Args:
+        df (pd.DataFrame): _description_
+
+    Returns:
+        pd.DataFrame: _description_
+    """
+    
     # 컬럼명 영어로 수정
     df_cols = [
         "num_date_time",
@@ -24,7 +34,16 @@ def rename_columns(df):
     return df
 
 
-def handling_missing_values(df):
+def handling_missing_values(df: pd.DataFrame) -> pd.DataFrame:
+    """_summary_
+
+    Args:
+        df (pd.DataFrame): _description_
+
+    Returns:
+        pd.DataFrame: _description_
+    """
+    
     # 강수량 결측치 0.0으로 채우기
     df["prec"].fillna(0.0, inplace=True)
 
@@ -35,7 +54,16 @@ def handling_missing_values(df):
     return df
 
 
-def create_time_columns(df):
+def create_time_columns(df: pd.DataFrame) -> pd.DataFrame:
+    """_summary_
+
+    Args:
+        df (pd.DataFrame): _description_
+
+    Returns:
+        pd.DataFrame: _description_
+    """
+    
     date = pd.to_datetime(df["date"])
     df["date"] = date
     df["hour"] = date.dt.hour
@@ -46,7 +74,16 @@ def create_time_columns(df):
     return df
 
 
-def create_holiday(df):
+def create_holiday(df: pd.DataFrame) -> pd.DataFrame:
+    """_summary_
+
+    Args:
+        df (pd.DataFrame): _description_
+
+    Returns:
+        pd.DataFrame: _description_
+    """
+    
     ## 공휴일 변수 추가
     df["holiday"] = df.apply(lambda x: 0 if x["day"] < 5 else 1, axis=1)
 
@@ -58,20 +95,47 @@ def create_holiday(df):
     return df
 
 
-def create_sin_cos_hour(df):
+def create_sin_cos_hour(df: pd.DataFrame) -> pd.DataFrame:
+    """_summary_
+
+    Args:
+        df (pd.DataFrame): _description_
+
+    Returns:
+        pd.DataFrame: _description_
+    """
+    
     # sin & cos 변수 추가
     df["sin_hour"] = np.sin(2 * np.pi * df["hour"] / 24)
     df["cos_hour"] = np.cos(2 * np.pi * df["hour"] / 24)
     return df
 
 
-def create_temp_f(df):
+def create_temp_f(df: pd.DataFrame) -> pd.DataFrame:
+    """_summary_
+
+    Args:
+        df (pd.DataFrame): _description_
+
+    Returns:
+        pd.DataFrame: _description_
+    """
+    
     # 화씨 온도 추가
     df["temp_f"] = (df["temp"] * 9 / 5) + 32
     return df
 
 
-def create_wind_chill_temp(df):
+def create_wind_chill_temp(df: pd.DataFrame) -> pd.DataFrame:
+    """_summary_
+
+    Args:
+        df (pd.DataFrame): _description_
+
+    Returns:
+        pd.DataFrame: _description_
+    """
+    
     # 체감 온도 변수 추가
     # https://www.weather.go.kr/w/theme/daily-life/regional-composite-index.do
     df["wind_chill_temp"] = (
@@ -83,7 +147,16 @@ def create_wind_chill_temp(df):
     return df
 
 
-def create_thi(df):
+def create_thi(df: pd.DataFrame) -> pd.DataFrame:
+    """_summary_
+
+    Args:
+        df (pd.DataFrame): _description_
+
+    Returns:
+        pd.DataFrame: _description_
+    """
+    
     # Temperature Humidity Index(THI) 변수 추가
     df["THI"] = (
         9 / 5 * df["temp"]
@@ -93,7 +166,16 @@ def create_thi(df):
     return df
 
 
-def create_cdh(df):
+def create_cdh(df: pd.DataFrame) -> pd.DataFrame:
+    """_summary_
+
+    Args:
+        df (pd.DataFrame): _description_
+
+    Returns:
+        pd.DataFrame: _description_
+    """
+    
     # Cooling Degree Hour 변수 추가
     def CDH(xs):
         ys = []
@@ -115,7 +197,16 @@ def create_cdh(df):
     return df
 
 
-def create_working_hour(df):
+def create_working_hour(df: pd.DataFrame) -> pd.DataFrame:
+    """_summary_
+
+    Args:
+        df (pd.DataFrame): _description_
+
+    Returns:
+        pd.DataFrame: _description_
+    """
+    
     # 일 관련 시간 추가
     df["work_hour"] = ((df["hour"] >= 8) & (df["hour"] <= 19)).astype(int)
     df["lunch_hour"] = (
@@ -133,7 +224,16 @@ def create_working_hour(df):
     return df
 
 
-def create_heat_index(df):
+def create_heat_index(df: pd.DataFrame) -> pd.DataFrame:
+    """_summary_
+
+    Args:
+        df (pd.DataFrame): _description_
+
+    Returns:
+        pd.DataFrame: _description_
+    """
+    
     T = df["temp_f"]
     RH = df["hum"]
     HI = pd.Series([0] * len(T), name="heat_index")
@@ -171,7 +271,16 @@ def create_heat_index(df):
 ### 발전량 평균 넣어주기
 
 ## 건물당 요일 + 시간별 발전량 평균 : day_hour_mean
-def create_day_hour_mean(df):
+def create_day_hour_mean(df: pd.DataFrame) -> pd.DataFrame:
+    """_summary_
+
+    Args:
+        df (pd.DataFrame): _description_
+
+    Returns:
+        pd.DataFrame: _description_
+    """
+    
     day_hour_power_mean = pd.pivot_table(df, values = 'power', 
                                          index = ['building_num', 'hour', 'day'], 
                                          aggfunc = np.mean).reset_index()
@@ -180,7 +289,16 @@ def create_day_hour_mean(df):
     
     return day_hour_power_mean
 
-def create_day_hour_std(df):
+def create_day_hour_std(df: pd.DataFrame) -> pd.DataFrame:
+    """_summary_
+
+    Args:
+        df (pd.DataFrame): _description_
+
+    Returns:
+        pd.DataFrame: _description_
+    """
+    
     day_hour_power_std = pd.pivot_table(df, values = 'power', 
                                          index = ['building_num', 'hour', 'day'], 
                                          aggfunc = np.std).reset_index()
@@ -190,7 +308,16 @@ def create_day_hour_std(df):
     return day_hour_power_std
 
 
-def create_hour_mean(df):
+def create_hour_mean(df: pd.DataFrame) -> pd.DataFrame:
+    """_summary_
+
+    Args:
+        df (pd.DataFrame): _description_
+
+    Returns:
+        pd.DataFrame: _description_
+    """
+    
     hour_power_mean = pd.pivot_table(df, values = 'power', 
                                          index = ['building_num', 'hour'], 
                                          aggfunc = np.mean).reset_index()
@@ -199,7 +326,16 @@ def create_hour_mean(df):
     
     return hour_power_mean
 
-def create_hour_std(df):
+def create_hour_std(df: pd.DataFrame) -> pd.DataFrame:
+    """_summary_
+
+    Args:
+        df (pd.DataFrame): _description_
+
+    Returns:
+        pd.DataFrame: _description_
+    """
+    
     hour_power_std = pd.pivot_table(df, values = 'power', 
                                          index = ['building_num', 'hour'], 
                                          aggfunc = np.std).reset_index()
