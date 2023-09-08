@@ -7,6 +7,7 @@ path:
   valid_split_path: "valid_split.csv"
   submission_path: "sample_submission.csv"
   best_iterations_path: "./save_iterations/best_iterations.json"
+  optuna_path: "./save_optuna/optuna_result.json"
 
 # 모델 이름 설정
 
