@@ -42,6 +42,6 @@ if __name__ == "__main__":
     elif args.mode == "h" or args.mode == "hp_searching":
         hp_search.hyperparameter_searching(conf)
     else:
-        print("실행모드를 다시 입력해주세요.")
+        print("실행모드를 다시 입력해주세요!")
         print("train        : t,\ttrain")
         print("inference    : i,\tinference")  # 아직 만드는 중
