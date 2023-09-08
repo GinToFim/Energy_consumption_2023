@@ -39,9 +39,9 @@ def hyperparameter_searching(conf):
             'max_depth' : np.arange(3,9,1) , 'colsample_bytree' :np.arange(0.8, 1.0, 0.1),
             'subsample' :np.arange(0.8, 1.0, 0.1)} # fix the n_estimators & eta(learning rate)
 
-    outlying_building = [3,14,21,30,40,42,53,54,91,95,98]
+    building_num = list(range(1,101))
 
-    for i in tqdm(outlying_building):
+    for i in tqdm(building_num):
         X_train = new_train_df[new_train_df["building_num"] == i].drop(['building_num', 'power'], axis=1)
         y_train = new_train_df[new_train_df["building_num"] == i]['power']
 
