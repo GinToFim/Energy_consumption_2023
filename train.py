@@ -9,7 +9,7 @@ from xgboost import XGBRegressor
 
 from tqdm import tqdm
 from utils import load
-from utils import preprocessing
+from utils import preprocessing_fn
 
 from utils import loss_fn
 from utils import metrics
@@ -29,9 +29,9 @@ def train(conf):
     print("⚡ Load Data Success")
 
     # 데이터 전처리하기
-    dp_train_df = preprocessing.train_pre_processing(train_df)
+    dp_train_df = preprocessing_fn.train_pre_processing(train_df)
     # TODO : valid_pre_processing 함수 만들기
-    dp_valid_df = preprocessing.test_pre_processing(valid_df, train_df=train_df)
+    dp_valid_df = preprocessing_fn.test_pre_processing(valid_df, train_df=train_df)
     print("⚡ Data Preprocessing Success")
 
     # Early stopping을 이용하여 건물별 best iteration 저장 

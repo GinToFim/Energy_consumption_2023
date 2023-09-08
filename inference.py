@@ -9,7 +9,7 @@ from xgboost import XGBRegressor
 
 from tqdm import tqdm
 from utils import load
-from utils import preprocessing
+from utils import preprocessing_fn
 
 from utils import loss_fn
 from utils import metrics
