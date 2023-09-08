@@ -65,6 +65,3 @@ def hyperparameter_searching(conf):
         pred = best.predict(X_valid)
         building = 'building '+str(i)
         print(building + ' || SMAPE : {}'.format(metrics.SMAPE(y_valid, pred)))
-        # preds = np.append(preds, pred)
-        # df_1 = pd.concat([df, pd.DataFrame(params, index = [0])], axis = 0)
-    #df_1.to_csv('/content/drive/MyDrive/Colab Notebooks/hyperparameter_xgb(1~50).csv', index)

@@ -1,46 +1,20 @@
-#!/usr/bin/env python
-# coding: utf-8
-
-# In[8]:
-
-
-pip install catboost
-
-
-# In[9]:
-
-
-pip install xgboost
-
-
-# In[36]:
-
-
 import random
 import pandas as pd
 import numpy as np
 import os
-
 import matplotlib.pyplot as plt
 
 # data pre-processing load
 from sklearn.model_selection import train_test_split
-
 from sklearn.ensemble import RandomForestRegressor
 
 # others ML model load
 from lightgbm import LGBMRegressor
 from xgboost import XGBRegressor
 from catboost import CatBoostRegressor
-
 from tqdm import tqdm
 
-
-# In[37]:
-
-
 # For reproducibility
-
 def seed_everything(seed):
     random.seed(seed)
     os.environ['PYTHONHASHSEED'] = str(seed)
