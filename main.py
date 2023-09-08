@@ -1,13 +1,13 @@
 import argparse
 
 import numpy as np
-import torch
 import random
 import os
 from omegaconf import OmegaConf
 
 import train
 import inference
+import hp_search
 
 # For reproducibility
 def seed_everything(seed):
@@ -38,7 +38,10 @@ if __name__ == "__main__":
     # [python main.py -m i]  or  [python main.py -m inference]    
     elif args.mode == "i" or args.mode == "inference":
         inference.inference(conf)
+    # [python main.py -m h]  or  [python main.py -m hp_search]     
+    elif args.mode == "h" or args.mode == "hp_searching":
+        hp_search.hyperparameter_searching(conf)
     else:
-        print("실행모드를 다시 입력해주세요.")
+        print("실행모드를 다시 입력해주세요!")
         print("train        : t,\ttrain")
         print("inference    : i,\tinference")  # 아직 만드는 중
