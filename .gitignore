@@ -108,6 +108,7 @@ ENV/
 .idea/
 __MACOSX/
 
-# save_iterations & predictions
+# hyper-parameter & preds directory
 save_iterations/
+save_optuna/
 predictions/
