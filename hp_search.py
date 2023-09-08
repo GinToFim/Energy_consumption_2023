@@ -30,6 +30,8 @@ def hyperparameter_searching(conf):
     new_valid_df = preprocessing.test_pre_processing(valid_df, train_df=train_df)
     print("⚡ Data Preprocessing Success")
 
+
+    print("⚡ hyper-parameter searching start")
     df = pd.DataFrame(columns = ['n_estimators', 'eta', 'min_child_weight','max_depth', 'colsample_bytree', 'subsample'])
     preds = np.array([])
 
@@ -53,7 +55,7 @@ def hyperparameter_searching(conf):
         #pds = PredefinedSplit(np.append(-np.ones(len(x)-168), np.zeros(168)))
         gcv = GridSearchCV(estimator = XGBRegressor(tree_method = 'hist',
                                                     objective = loss_fn.weighted_mse(1)),
-                        param_grid = grid, scoring = metrics.SMAPE, cv = 5, refit = True, verbose = True)
+                        param_grid = grid, cv = 5, refit = True, verbose = True)
 
 
         gcv.fit(X_train, y_train, eval_set=[(X_valid, y_valid)], verbose=False)
@@ -63,6 +65,6 @@ def hyperparameter_searching(conf):
         pred = best.predict(X_valid)
         building = 'building '+str(i)
         print(building + ' || SMAPE : {}'.format(metrics.SMAPE(y_valid, pred)))
-        preds = np.append(preds, pred)
-        df_1 = pd.concat([df, pd.DataFrame(params, index = [0])], axis = 0)
+        # preds = np.append(preds, pred)
+        # df_1 = pd.concat([df, pd.DataFrame(params, index = [0])], axis = 0)
     #df_1.to_csv('/content/drive/MyDrive/Colab Notebooks/hyperparameter_xgb(1~50).csv', index)
