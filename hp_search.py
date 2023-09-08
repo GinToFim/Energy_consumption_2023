@@ -31,7 +31,7 @@ def hyperparameter_searching(conf):
     print("⚡ Data Preprocessing Success")
 
 
-    print("⚡ hyper-parameter searching start")
+    print("⚡ hyper-parameter searching start!")
     df = pd.DataFrame(columns = ['n_estimators', 'eta', 'min_child_weight','max_depth', 'colsample_bytree', 'subsample'])
     preds = np.array([])
 
