@@ -1,8 +1,19 @@
+"""preprocessing_fn.py에서의 함수들을 이용하여 실질적인 preprocessing 수행
+"""
+
 import numpy as np
 import pandas as pd
 import preprocessing_fn
 
-def train_pre_processing(train_df):
+def train_pre_processing(train_df: pd.DataFrame) -> pd.DataFrame:
+    """train_df DataFrame을 입력받아 전처리한다
+
+    Args:
+        train_df (pd.DataFrame): DataFrame type의 학습 데이터셋
+
+    Returns:
+        pd.DataFrame: 전처리 후의 DataFrame type의 학습 데이터셋
+    """
     # 컬럼명 영어로 수정
     train_df = preprocessing_fn.rename_columns(train_df)
     
@@ -51,6 +62,15 @@ def train_pre_processing(train_df):
     return train_df
 
 def test_pre_processing(test_df, train_df=None):
+    """test_df DataFrame을 입력받아 전처리한다
+
+    Args:
+        test_df (pd.DataFrame): DataFrame type의 테스트 데이터셋
+
+    Returns:
+        pd.DataFrame: 전처리 후의 DataFrame type의 테스트 데이터셋
+    """
+    
     # 컬럼명 영어로 수정
     test_df = preprocessing_fn.rename_columns(test_df)
     train_df = preprocessing_fn.rename_columns(train_df)
@@ -86,11 +106,11 @@ def test_pre_processing(test_df, train_df=None):
     # heat_index 추가
     test_df = preprocessing_fn.create_heat_index(test_df)
     
-    #  day_hour_mean 변수 추가
+    # day_hour_mean 변수 추가
     day_hour_power_mean = preprocessing_fn.create_day_hour_mean(train_df)
     test_df = pd.merge(test_df, day_hour_power_mean, how='left', on=['building_num', 'hour', 'day'])
     
-    #  day_hour_std 변수 추가
+    # day_hour_std 변수 추가
     day_hour_power_std = preprocessing_fn.create_day_hour_std(train_df)
     test_df = pd.merge(test_df, day_hour_power_std, how='left', on=['building_num', 'hour', 'day'])
     

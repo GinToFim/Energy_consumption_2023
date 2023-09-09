@@ -1,16 +1,19 @@
+"""pandas DataFrame 형태로 주어진 data를 전처리하기 위한 함수들
+"""
+
 import numpy as np
 import pandas as pd
 from typing import *
 
-
 def rename_columns(df: pd.DataFrame) -> pd.DataFrame:
-    """_summary_
+    """기존 한글로 적혀있던 columns들을 영문으로 변경
 
     Args:
-        df (pd.DataFrame): _description_
+        df (pd.DataFrame): 각 빌딩들의 시간별 정보를 담고 있는 DataFrame
 
     Returns:
-        pd.DataFrame: _description_
+        pd.DataFrame: 각 빌딩들의 시간별 정보의 속성이 영문으로 된 DataFrame
+        ex. "기온(C)" -> "temp"
     """
     
     # 컬럼명 영어로 수정
@@ -35,13 +38,13 @@ def rename_columns(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def handling_missing_values(df: pd.DataFrame) -> pd.DataFrame:
-    """_summary_
+    """DataFrame 내에 존재하는 결측치를 채운다
 
     Args:
-        df (pd.DataFrame): _description_
+        df (pd.DataFrame): 각 빌딩들의 시간별 정보를 담고 있는 DataFrame
 
     Returns:
-        pd.DataFrame: _description_
+        pd.DataFrame: 각 빌딩들의 시간별 정보의 속성 중 결측치를 채운 DataFrame
     """
     
     # 강수량 결측치 0.0으로 채우기
@@ -55,13 +58,13 @@ def handling_missing_values(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def create_time_columns(df: pd.DataFrame) -> pd.DataFrame:
-    """_summary_
+    """DataFrame의 date열의 값을 이용하여 유용한 열("hour", "day", etc.)을 추가 생성
 
     Args:
-        df (pd.DataFrame): _description_
+        df (pd.DataFrame): 각 빌딩들의 시간별 정보를 담고 있는 DataFrame
 
     Returns:
-        pd.DataFrame: _description_
+        pd.DataFrame: date열의 값을 이용한 유용한 열("hour", "day", etc.)을 추가한 DataFrame 반환
     """
     
     date = pd.to_datetime(df["date"])
@@ -75,13 +78,14 @@ def create_time_columns(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def create_holiday(df: pd.DataFrame) -> pd.DataFrame:
-    """_summary_
+    """주말 이외의 공휴일임을 나타내는 열("holiday") 추가
+        (학습시 공휴일임을 인지시키기 위함)
 
     Args:
-        df (pd.DataFrame): _description_
+        df (pd.DataFrame): 각 빌딩들의 시간별 정보를 담고 있는 DataFrame
 
     Returns:
-        pd.DataFrame: _description_
+        pd.DataFrame: "holiday"열이 추가된 DataFrame
     """
     
     ## 공휴일 변수 추가
@@ -96,13 +100,13 @@ def create_holiday(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def create_sin_cos_hour(df: pd.DataFrame) -> pd.DataFrame:
-    """_summary_
+    """24시간제로 표현한 "hour"을 주기가 1/24인 주기함수(sin, cos)에 대입한 값을 저정하는 "sin_hour"과 "cos_hour"열을 추가
 
     Args:
-        df (pd.DataFrame): _description_
+        df (pd.DataFrame): 각 빌딩들의 시간별 정보를 담고 있는 DataFrame
 
     Returns:
-        pd.DataFrame: _description_
+        pd.DataFrame: "sin_hour"과 "cos_hour"열을 추가한 DataFrame
     """
     
     # sin & cos 변수 추가
@@ -112,13 +116,13 @@ def create_sin_cos_hour(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def create_temp_f(df: pd.DataFrame) -> pd.DataFrame:
-    """_summary_
+    """화씨 온도 표시법에 해당하는 온도 값을 나타내는 열("temp_f")을 추가
 
     Args:
-        df (pd.DataFrame): _description_
+        df (pd.DataFrame): 각 빌딩들의 시간별 정보를 담고 있는 DataFrame
 
     Returns:
-        pd.DataFrame: _description_
+        pd.DataFrame: 화씨 온도 표시법에 해당하는 온도 값을 나타내는 열("temp_f")을 추가한 DataFrame
     """
     
     # 화씨 온도 추가
@@ -127,13 +131,13 @@ def create_temp_f(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def create_wind_chill_temp(df: pd.DataFrame) -> pd.DataFrame:
-    """_summary_
+    """ "temp", "wind"을 이용하여 체감온도를 나타내는 열("wind_chill_temp") 추가
 
     Args:
-        df (pd.DataFrame): _description_
+        df (pd.DataFrame): 각 빌딩들의 시간별 정보를 담고 있는 DataFrame
 
     Returns:
-        pd.DataFrame: _description_
+        pd.DataFrame: "temp", "wind"을 이용하여 체감온도를 나타내는 열("wind_chill_temp") 추가한 DataFrame
     """
     
     # 체감 온도 변수 추가
@@ -148,13 +152,13 @@ def create_wind_chill_temp(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def create_thi(df: pd.DataFrame) -> pd.DataFrame:
-    """_summary_
+    """ "temp", "hum"을 이용하여 불쾌지수와 관련이 있는 온도 습도 지수 열("THI") 추가
 
     Args:
-        df (pd.DataFrame): _description_
+        df (pd.DataFrame): 각 빌딩들의 시간별 정보를 담고 있는 DataFrame
 
     Returns:
-        pd.DataFrame: _description_
+        pd.DataFrame: 온도 습도 지수 열("THI") 추가한 DataFrame
     """
     
     # Temperature Humidity Index(THI) 변수 추가
@@ -167,17 +171,26 @@ def create_thi(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def create_cdh(df: pd.DataFrame) -> pd.DataFrame:
-    """_summary_
+    """CDH 함수를 이용하여 Cooling Degree Hour 값이 들어있는 1차원 numpy 배열을 생성하고
+        이를 새로운 열("CDH") 생성
 
     Args:
-        df (pd.DataFrame): _description_
+        df (pd.DataFrame): 각 빌딩들의 시간별 정보를 담고 있는 DataFrame
 
     Returns:
-        pd.DataFrame: _description_
+        pd.DataFrame: 새로운 열("CDH")이 추가된 DataFrame
     """
     
     # Cooling Degree Hour 변수 추가
-    def CDH(xs):
+    def CDH(xs: np.ndarray) -> np.ndarray:
+        """1차원 numpy 배열을 입력받아 Cooling Degree Hour 변수가 들어있는 numpy 배열을 반환
+
+        Args:
+            xs (np.ndarray): 특정 빌딩의 온도 값을 저장하는 1차원 numpy 배열
+
+        Returns:
+            np.ndarray: 해당 빌딩의 Cooling Degree Hour 값을 저장하는 1차원 numpy 배열
+        """
         ys = []
         for i in range(len(xs)):
             if i < 11:
@@ -198,13 +211,15 @@ def create_cdh(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def create_working_hour(df: pd.DataFrame) -> pd.DataFrame:
-    """_summary_
+    """각 빌딩들의 시간별로의 정보를 담고 있는 DataFrame을 입력받고,
+        시간대를 3가지로 분류할 수 있도록
+        "work_hour", "lunch_hour", "lunch_hour2" 3가지 열을 추가
 
     Args:
-        df (pd.DataFrame): _description_
+        df (pd.DataFrame): 각 빌딩들의 시간별 정보를 담고 있는 DataFrame
 
     Returns:
-        pd.DataFrame: _description_
+        pd.DataFrame: "work_hour", "lunch_hour", "lunch_hour2" 열이 추가된 DataFrame
     """
     
     # 일 관련 시간 추가
@@ -225,13 +240,13 @@ def create_working_hour(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def create_heat_index(df: pd.DataFrame) -> pd.DataFrame:
-    """_summary_
+    """기존 DataFrame에 열지수("heat_index") 열을 추가
 
     Args:
-        df (pd.DataFrame): _description_
+        df (pd.DataFrame): 각 빌딩들의 시간별 정보를 담고 있는 DataFrame
 
     Returns:
-        pd.DataFrame: _description_
+        pd.DataFrame: 열지수("heat_index") 열이 추가된 DataFrame
     """
     
     T = df["temp_f"]
@@ -272,13 +287,13 @@ def create_heat_index(df: pd.DataFrame) -> pd.DataFrame:
 
 ## 건물당 요일 + 시간별 발전량 평균 : day_hour_mean
 def create_day_hour_mean(df: pd.DataFrame) -> pd.DataFrame:
-    """_summary_
+    """DataFrame을 입력받아 시간별, 요일별 발전량 평균값을 저장하는 DataFrame을 만들어 반환
 
     Args:
-        df (pd.DataFrame): _description_
+        df (pd.DataFrame): 각 빌딩들의 시간별 정보를 담고 있는 DataFrame
 
     Returns:
-        pd.DataFrame: _description_
+        pd.DataFrame: 시간별, 요일별 발전량 평균값을 저장하는 DataFrame
     """
     
     day_hour_power_mean = pd.pivot_table(df, values = 'power', 
@@ -290,13 +305,13 @@ def create_day_hour_mean(df: pd.DataFrame) -> pd.DataFrame:
     return day_hour_power_mean
 
 def create_day_hour_std(df: pd.DataFrame) -> pd.DataFrame:
-    """_summary_
+    """DataFrame을 입력받아 시간별, 요일별 발전량의 표준편차를 저장하는 DataFrame을 만들어 반환
 
     Args:
-        df (pd.DataFrame): _description_
+        df (pd.DataFrame): 각 빌딩들의 시간별 정보를 담고 있는 DataFrame
 
     Returns:
-        pd.DataFrame: _description_
+        pd.DataFrame: 시간별, 요일별 발전량의 표준편차를 저장하는 DataFrame
     """
     
     day_hour_power_std = pd.pivot_table(df, values = 'power', 
@@ -309,13 +324,13 @@ def create_day_hour_std(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def create_hour_mean(df: pd.DataFrame) -> pd.DataFrame:
-    """_summary_
+    """DataFrame을 입력받아 시간별 발전량 평균값을 저장하는 DataFrame을 만들어 반환
 
     Args:
-        df (pd.DataFrame): _description_
+        df (pd.DataFrame): 각 빌딩들의 시간별 정보를 담고 있는 DataFrame
 
     Returns:
-        pd.DataFrame: _description_
+        pd.DataFrame: 시간별 발전량 평균값을 저장하는 DataFrame
     """
     
     hour_power_mean = pd.pivot_table(df, values = 'power', 
@@ -327,13 +342,13 @@ def create_hour_mean(df: pd.DataFrame) -> pd.DataFrame:
     return hour_power_mean
 
 def create_hour_std(df: pd.DataFrame) -> pd.DataFrame:
-    """_summary_
+    """DataFrame을 입력받아 시간별 발전량 표준편차를 저장하는 DataFrame을 만들어 반환
 
     Args:
-        df (pd.DataFrame): _description_
+        df (pd.DataFrame): 각 빌딩들의 시간별 정보를 담고 있는 DataFrame
 
     Returns:
-        pd.DataFrame: _description_
+        pd.DataFrame: 시간별 발전량 표준편차를 저장하는 DataFrame
     """
     
     hour_power_std = pd.pivot_table(df, values = 'power', 
