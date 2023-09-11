@@ -1,10 +1,9 @@
-import json
 import numpy as np
 import pandas as pd
 
 # XGBoost Regressor model load
 from xgboost import XGBRegressor
-from sklearn.model_selection import PredefinedSplit, GridSearchCV
+from sklearn.model_selection import GridSearchCV
 
 from tqdm import tqdm
 from utils import load
