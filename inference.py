@@ -8,7 +8,7 @@ from xgboost import XGBRegressor
 
 from tqdm import tqdm
 from utils import load
-from utils import preprocessing
+from utils import preprocessing_fn
 from utils import loss_fn
 
 
@@ -26,9 +26,9 @@ def inference(conf):
     print("⚡ Load Data Success")
 
     # 데이터 전처리하기
-    new_train_df = preprocessing.train_pre_processing(train_df)
+    new_train_df = preprocessing_fn.train_pre_processing(train_df)
     # TODO : valid_pre_processing 함수 만들기
-    new_test_df = preprocessing.test_pre_processing(test_df, train_df=train_df)
+    new_test_df = preprocessing_fn.test_pre_processing(test_df, train_df=train_df)
     print("⚡ Data Preprocessing Success")
 
     # 예측값을 담을 리스트
