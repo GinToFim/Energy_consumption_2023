@@ -1,18 +1,13 @@
 import json
 
-# XGBoost Regressor model load
-from xgboost import XGBRegressor
-
 # Hyper-parameter Searching
 import optuna
 from optuna import Trial
 from optuna.samplers import TPESampler
+# XGBoost Regressor model load
+from xgboost import XGBRegressor
 
-from utils import load
-from utils import preprocessing
-
-from utils import loss_fn
-from utils import metrics
+from utils import load, loss_fn, metrics, preprocessing
 
 
 def objectiveXGBRegressor(trial: Trial, X_train, y_train, X_valid, y_valid):

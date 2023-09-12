@@ -1,9 +1,11 @@
 """pandas DataFrame 형태로 주어진 data를 전처리하기 위한 함수들
 """
 
+from typing import *
+
 import numpy as np
 import pandas as pd
-from typing import *
+
 
 def rename_columns(df: pd.DataFrame) -> pd.DataFrame:
     """기존 한글로 적혀있던 columns들을 영문으로 변경
@@ -15,7 +17,7 @@ def rename_columns(df: pd.DataFrame) -> pd.DataFrame:
         pd.DataFrame: 각 빌딩들의 시간별 정보의 속성이 영문으로 된 DataFrame
         ex. "기온(C)" -> "temp"
     """
-    
+
     # 컬럼명 영어로 수정
     df_cols = [
         "num_date_time",
@@ -46,7 +48,7 @@ def handling_missing_values(df: pd.DataFrame) -> pd.DataFrame:
     Returns:
         pd.DataFrame: 각 빌딩들의 시간별 정보의 속성 중 결측치를 채운 DataFrame
     """
-    
+
     # 강수량 결측치 0.0으로 채우기
     df["prec"].fillna(0.0, inplace=True)
 
@@ -66,7 +68,7 @@ def create_time_columns(df: pd.DataFrame) -> pd.DataFrame:
     Returns:
         pd.DataFrame: date열의 값을 이용한 유용한 열("hour", "day", etc.)을 추가한 DataFrame 반환
     """
-    
+
     date = pd.to_datetime(df["date"])
     df["date"] = date
     df["hour"] = date.dt.hour
@@ -87,7 +89,7 @@ def create_holiday(df: pd.DataFrame) -> pd.DataFrame:
     Returns:
         pd.DataFrame: "holiday"열이 추가된 DataFrame
     """
-    
+
     ## 공휴일 변수 추가
     df["holiday"] = df.apply(lambda x: 0 if x["day"] < 5 else 1, axis=1)
 
@@ -108,7 +110,7 @@ def create_sin_cos_hour(df: pd.DataFrame) -> pd.DataFrame:
     Returns:
         pd.DataFrame: "sin_hour"과 "cos_hour"열을 추가한 DataFrame
     """
-    
+
     # sin & cos 변수 추가
     df["sin_hour"] = np.sin(2 * np.pi * df["hour"] / 24)
     df["cos_hour"] = np.cos(2 * np.pi * df["hour"] / 24)
@@ -124,7 +126,7 @@ def create_temp_f(df: pd.DataFrame) -> pd.DataFrame:
     Returns:
         pd.DataFrame: 화씨 온도 표시법에 해당하는 온도 값을 나타내는 열("temp_f")을 추가한 DataFrame
     """
-    
+
     # 화씨 온도 추가
     df["temp_f"] = (df["temp"] * 9 / 5) + 32
     return df
@@ -139,7 +141,7 @@ def create_wind_chill_temp(df: pd.DataFrame) -> pd.DataFrame:
     Returns:
         pd.DataFrame: "temp", "wind"을 이용하여 체감온도를 나타내는 열("wind_chill_temp") 추가한 DataFrame
     """
-    
+
     # 체감 온도 변수 추가
     # https://www.weather.go.kr/w/theme/daily-life/regional-composite-index.do
     df["wind_chill_temp"] = (
@@ -160,7 +162,7 @@ def create_thi(df: pd.DataFrame) -> pd.DataFrame:
     Returns:
         pd.DataFrame: 온도 습도 지수 열("THI") 추가한 DataFrame
     """
-    
+
     # Temperature Humidity Index(THI) 변수 추가
     df["THI"] = (
         9 / 5 * df["temp"]
@@ -180,7 +182,7 @@ def create_cdh(df: pd.DataFrame) -> pd.DataFrame:
     Returns:
         pd.DataFrame: 새로운 열("CDH")이 추가된 DataFrame
     """
-    
+
     # Cooling Degree Hour 변수 추가
     def CDH(xs: np.ndarray) -> np.ndarray:
         """1차원 numpy 배열을 입력받아 Cooling Degree Hour 변수가 들어있는 numpy 배열을 반환
@@ -221,7 +223,7 @@ def create_working_hour(df: pd.DataFrame) -> pd.DataFrame:
     Returns:
         pd.DataFrame: "work_hour", "lunch_hour", "lunch_hour2" 열이 추가된 DataFrame
     """
-    
+
     # 일 관련 시간 추가
     df["work_hour"] = ((df["hour"] >= 8) & (df["hour"] <= 19)).astype(int)
     df["lunch_hour"] = (
@@ -248,7 +250,7 @@ def create_heat_index(df: pd.DataFrame) -> pd.DataFrame:
     Returns:
         pd.DataFrame: 열지수("heat_index") 열이 추가된 DataFrame
     """
-    
+
     T = df["temp_f"]
     RH = df["hum"]
     HI = pd.Series([0] * len(T), name="heat_index")
@@ -283,7 +285,9 @@ def create_heat_index(df: pd.DataFrame) -> pd.DataFrame:
 
     return df
 
+
 ### 발전량 평균 넣어주기
+
 
 ## 건물당 요일 + 시간별 발전량 평균 : day_hour_mean
 def create_day_hour_mean(df: pd.DataFrame) -> pd.DataFrame:
@@ -295,14 +299,15 @@ def create_day_hour_mean(df: pd.DataFrame) -> pd.DataFrame:
     Returns:
         pd.DataFrame: 시간별, 요일별 발전량 평균값을 저장하는 DataFrame
     """
-    
-    day_hour_power_mean = pd.pivot_table(df, values = 'power', 
-                                         index = ['building_num', 'hour', 'day'], 
-                                         aggfunc = np.mean).reset_index()
-    
-    day_hour_power_mean.columns = ['building_num', 'hour', 'day', 'day_hour_mean']
-    
+
+    day_hour_power_mean = pd.pivot_table(
+        df, values="power", index=["building_num", "hour", "day"], aggfunc=np.mean
+    ).reset_index()
+
+    day_hour_power_mean.columns = ["building_num", "hour", "day", "day_hour_mean"]
+
     return day_hour_power_mean
+
 
 def create_day_hour_std(df: pd.DataFrame) -> pd.DataFrame:
     """DataFrame을 입력받아 시간별, 요일별 발전량의 표준편차를 저장하는 DataFrame을 만들어 반환
@@ -313,13 +318,13 @@ def create_day_hour_std(df: pd.DataFrame) -> pd.DataFrame:
     Returns:
         pd.DataFrame: 시간별, 요일별 발전량의 표준편차를 저장하는 DataFrame
     """
-    
-    day_hour_power_std = pd.pivot_table(df, values = 'power', 
-                                         index = ['building_num', 'hour', 'day'], 
-                                         aggfunc = np.std).reset_index()
-    
-    day_hour_power_std.columns = ['building_num', 'hour', 'day', 'day_hour_std']
-    
+
+    day_hour_power_std = pd.pivot_table(
+        df, values="power", index=["building_num", "hour", "day"], aggfunc=np.std
+    ).reset_index()
+
+    day_hour_power_std.columns = ["building_num", "hour", "day", "day_hour_std"]
+
     return day_hour_power_std
 
 
@@ -332,14 +337,15 @@ def create_hour_mean(df: pd.DataFrame) -> pd.DataFrame:
     Returns:
         pd.DataFrame: 시간별 발전량 평균값을 저장하는 DataFrame
     """
-    
-    hour_power_mean = pd.pivot_table(df, values = 'power', 
-                                         index = ['building_num', 'hour'], 
-                                         aggfunc = np.mean).reset_index()
-    
-    hour_power_mean.columns = ['building_num', 'hour', 'hour_mean']
-    
+
+    hour_power_mean = pd.pivot_table(
+        df, values="power", index=["building_num", "hour"], aggfunc=np.mean
+    ).reset_index()
+
+    hour_power_mean.columns = ["building_num", "hour", "hour_mean"]
+
     return hour_power_mean
+
 
 def create_hour_std(df: pd.DataFrame) -> pd.DataFrame:
     """DataFrame을 입력받아 시간별 발전량 표준편차를 저장하는 DataFrame을 만들어 반환
@@ -350,11 +356,11 @@ def create_hour_std(df: pd.DataFrame) -> pd.DataFrame:
     Returns:
         pd.DataFrame: 시간별 발전량 표준편차를 저장하는 DataFrame
     """
-    
-    hour_power_std = pd.pivot_table(df, values = 'power', 
-                                         index = ['building_num', 'hour'], 
-                                         aggfunc = np.std).reset_index()
-    
-    hour_power_std.columns = ['building_num', 'hour', 'hour_std']
-    
+
+    hour_power_std = pd.pivot_table(
+        df, values="power", index=["building_num", "hour"], aggfunc=np.std
+    ).reset_index()
+
+    hour_power_std.columns = ["building_num", "hour", "hour_std"]
+
     return hour_power_std

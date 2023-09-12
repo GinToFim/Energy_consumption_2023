@@ -1,20 +1,22 @@
 import argparse
+import os
+import random
 
 import numpy as np
-import random
-import os
 from omegaconf import OmegaConf
 
-import train
-import inference
 import hp_search
+import inference
 import opt_search
+import train
+
 
 # For reproducibility
 def seed_everything(seed):
     random.seed(seed)
-    os.environ['PYTHONHASHSEED'] = str(seed)
+    os.environ["PYTHONHASHSEED"] = str(seed)
     np.random.seed(seed)
+
 
 if __name__ == "__main__":
     # parser 객체 생성
@@ -29,17 +31,17 @@ if __name__ == "__main__":
     conf = OmegaConf.load(f"./config/{args.config}.yaml")
 
     # For reproducibility (Seed 고정)
-    seed_everything(42) 
-    
+    seed_everything(42)
+
     print("⚡ 실행 중인 config file:", args.config)
 
     # [python main.py -m t]  or [python main.py -m train]
     if args.mode == "t" or args.mode == "train":
         train.train(conf)
-    # [python main.py -m i]  or [python main.py -m inference]    
+    # [python main.py -m i]  or [python main.py -m inference]
     elif args.mode == "i" or args.mode == "inference":
         inference.inference(conf)
-    # [python main.py -m h]  or  [python main.py -m hp_search]     
+    # [python main.py -m h]  or  [python main.py -m hp_search]
     elif args.mode == "h" or args.mode == "hp_searching":
         hp_search.hyperparameter_searching(conf)
     # [python main.py -m o] or [python main.py -m optuna]
@@ -48,6 +50,6 @@ if __name__ == "__main__":
     else:
         print("실행모드를 다시 입력해주세요.")
         print("train         : t,  train")
-        print("inference     : i,  inference") 
+        print("inference     : i,  inference")
         print("hp search     : h,  hp_searching")
         print("optuna search : o,  optuna")

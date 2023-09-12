@@ -1,17 +1,15 @@
 import json
-import numpy as np
 
+import numpy as np
+from tqdm import tqdm
 # XGBoost Regressor model load
 from xgboost import XGBRegressor
 
-from tqdm import tqdm
-from utils import load
-from utils import preprocessing_fn
+from utils import load, loss_fn, metrics, preprocessing_fn
 
-from utils import loss_fn
-from utils import metrics
 # TODO : (train_split, valid_split), (train, test) 쌍 train 훈련 저장시키기?
 # TODO : best_iterations json에 저장시키기
+
 
 def train(conf):
     # 데이터프레임 path 정의
@@ -20,7 +18,7 @@ def train(conf):
     valid_path = conf.path.valid_split_path
 
     # 데이터프레임 불러오기
-    train_df = load.load_train_df(dir_path, train_path) 
+    train_df = load.load_train_df(dir_path, train_path)
     valid_df = load.load_valid_df(dir_path, valid_path)
     print("⚡ Load Data Success")
 
@@ -30,9 +28,9 @@ def train(conf):
     new_valid_df = preprocessing_fn.test_pre_processing(valid_df, train_df=train_df)
     print("⚡ Data Preprocessing Success")
 
-    # Early stopping을 이용하여 건물별 best iteration 저장 
+    # Early stopping을 이용하여 건물별 best iteration 저장
     best_iterations_dict = dict()
-    
+
     all_y_valid = []
     all_y_pred = []
 
@@ -40,47 +38,57 @@ def train(conf):
     start, end = 1, 100
 
     print("⚡ model train")
-    # building별로 모델 학습 및 훈련하기 
+    # building별로 모델 학습 및 훈련하기
     for building_num in tqdm(range(start, end + 1)):
-        
-        X_train = new_train_df[new_train_df["building_num"] == building_num].drop(['building_num', 'power'], axis=1)
-        y_train = new_train_df[new_train_df["building_num"] == building_num]['power']
+        X_train = new_train_df[new_train_df["building_num"] == building_num].drop(
+            ["building_num", "power"], axis=1
+        )
+        y_train = new_train_df[new_train_df["building_num"] == building_num]["power"]
 
-        X_valid = new_valid_df[new_valid_df["building_num"] == building_num].drop(['building_num', 'power'], axis=1)
-        y_valid = new_valid_df[new_valid_df["building_num"] == building_num]['power']
-        
-        X_train['week'] = X_train['week'].astype('int64')
-        X_valid['week'] = X_valid['week'].astype('int64')
-        
-        xgb_reg = XGBRegressor(n_estimators = 10000, eta = 0.01, min_child_weight = 6, 
-                               max_depth = 5, colsample_bytree = 0.5, 
-                               subsample = 0.9, seed=42)
-        
-        xgb_reg.set_params(**{'objective':loss_fn.weighted_mse(2)})
-        xgb_reg.set_params(**{'early_stopping_rounds':1000})
-        
+        X_valid = new_valid_df[new_valid_df["building_num"] == building_num].drop(
+            ["building_num", "power"], axis=1
+        )
+        y_valid = new_valid_df[new_valid_df["building_num"] == building_num]["power"]
+
+        X_train["week"] = X_train["week"].astype("int64")
+        X_valid["week"] = X_valid["week"].astype("int64")
+
+        xgb_reg = XGBRegressor(
+            n_estimators=10000,
+            eta=0.01,
+            min_child_weight=6,
+            max_depth=5,
+            colsample_bytree=0.5,
+            subsample=0.9,
+            seed=42,
+        )
+
+        xgb_reg.set_params(**{"objective": loss_fn.weighted_mse(2)})
+        xgb_reg.set_params(**{"early_stopping_rounds": 1000})
 
         xgb_reg.fit(X_train, y_train, eval_set=[(X_valid, y_valid)], verbose=False)
-        
+
         y_pred = xgb_reg.predict(X_valid)
-        
+
         best_iterations_dict[building_num] = xgb_reg.best_iteration
-        
+
         all_y_valid.extend(y_valid)
         all_y_pred.extend(y_pred)
 
-        print("-"*20)
+        print("-" * 20)
         print(f"building_num : {building_num}")
-        print('best iterations: {}'.format(xgb_reg.best_iteration))
-        print('SMAPE : {}'.format(metrics.SMAPE(y_valid, y_pred)))
+        print("best iterations: {}".format(xgb_reg.best_iteration))
+        print("SMAPE : {}".format(metrics.SMAPE(y_valid, y_pred)))
         print()
-    
+
     # 총 빌딩별 예측 결과값 확인하기
-    print("-"*45)
-    print(f'building_num {start}-{end} SMAPE : {metrics.SMAPE(np.array(all_y_valid), np.array(all_y_pred))}')
-    print("-"*45)
+    print("-" * 45)
+    print(
+        f"building_num {start}-{end} SMAPE : {metrics.SMAPE(np.array(all_y_valid), np.array(all_y_pred))}"
+    )
+    print("-" * 45)
 
     # best_iterations 저장하기
     iterations_path = conf.path.best_iterations_path
-    with open(iterations_path, "w") as f :
-        json.dump(best_iterations_dict, f)    
+    with open(iterations_path, "w") as f:
+        json.dump(best_iterations_dict, f)

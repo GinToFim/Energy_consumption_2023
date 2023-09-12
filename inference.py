@@ -1,15 +1,13 @@
 import json
-import time
-import numpy as np
 import os
+import time
 
+import numpy as np
+from tqdm import tqdm
 # XGBoost Regressor model load
 from xgboost import XGBRegressor
 
-from tqdm import tqdm
-from utils import load
-from utils import preprocessing_fn
-from utils import loss_fn
+from utils import load, loss_fn, preprocessing_fn
 
 
 def inference(conf):
@@ -75,7 +73,7 @@ def inference(conf):
         y_pred = xgb_reg.predict(X_test)
         all_y_pred = np.concatenate((all_y_pred, y_pred), axis=0)
 
-    submission_df['answer'] = all_y_pred
+    submission_df["answer"] = all_y_pred
 
     # prediction 결과 폴더없으면 생성하기
     preds_path = "./predictions"
@@ -83,5 +81,5 @@ def inference(conf):
         os.makedirs(preds_path)
 
     # 현재 시간을 기준으로 예측 결과 csv 생성
-    now = time.strftime('%y%m%d-%H%M%S') 
-    submission_df.to_csv(f'./predictions/pred_{now}.csv', index=False)
+    now = time.strftime("%y%m%d-%H%M%S")
+    submission_df.to_csv(f"./predictions/pred_{now}.csv", index=False)
